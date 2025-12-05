@@ -1,0 +1,53 @@
+/* 전체 컨테이너 */
+.wrap {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 0 15px;
+  font-family: system-ui, sans-serif;
+}
+
+/* 가로 정렬 행 */
+.row {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+/* 입력창 스타일 */
+.row input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* 버튼 스타일 */
+.row button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* 비디오 2개를 나란히 */
+.videos {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+/* 비디오 기본 스타일(16:9, 검정 배경) */
+video {
+  flex: 1;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 8px;
+}
+
+/* 로그 박스 */
+.log {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 8px;
+  height: 150px;
+  overflow-y: auto;
+  border-radius: 6px;
+}
