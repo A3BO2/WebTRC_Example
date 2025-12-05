@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: webrtc-signal
+    rootDir: server
+    env: node
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    plan: free
+    autoDeploy: true
+
+  - type: static
+    name: webrtc-client
+    rootDir: client
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "dist"
+    envVars:
+      - key: VITE_SIGNAL_URL
+        fromService:
+          name: webrtc-signal
+          type: web
+          property: url

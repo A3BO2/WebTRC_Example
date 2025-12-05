@@ -1,46 +1,46 @@
-// 시그널링 서버와 통신하기 위한 Socket.IO 클라이언트
+// client/src/webrtc.js
+// ───────────────────────────────────────────────────────────────
+// 브라우저 쪽 헬퍼:
+//  - Socket.IO 클라이언트 생성
+//  - WebRTC PeerConnection 생성 (핵심 이벤트 핸들러 포함)
+// ───────────────────────────────────────────────────────────────
+
 import { io } from "socket.io-client";
 
-/**
- * 🔌 시그널링 서버에 연결해서 소켓 인스턴스를 반환
- * - WebRTC에서는 offer/answer/ice 같은 "문자 메시지"를
- *   P2P가 연결되기 전까지 이 소켓으로 주고받음
+/** 시그널링 서버에 연결 (Socket.IO)
+ *  - P2P 연결 전에 Offer/Answer/ICE 같은 "문자 메시지"를 주고받는 용도
  */
 export function createSocket() {
-  return io("http://localhost:3001", {
-    transports: ["websocket"], // 웹소켓만 사용(폴백 비활성화) → 디버깅 단순화
+  // URL은 .env (VITE_SIGNAL_URL)에서 주입
+  const url = import.meta.env.VITE_SIGNAL_URL;
+  return io(url, {
+    transports: ["websocket"], // 디버깅 단순화를 위해 websocket 고정
   });
 }
 
-/**
- * 🎥 WebRTC PeerConnection 생성
- * @param {Object} handlers
- * @param {Function} handlers.onTrack  - 상대 영상(원격 스트림)이 들어왔을 때 콜백
- * @param {Function} handlers.onIce    - ICE 후보가 발견됐을 때 콜백(보통 서버로 전달)
- * @param {Function} handlers.onState  - 연결 상태(new/connecting/connected/...) 바뀔 때 콜백
+/** WebRTC PeerConnection 생성
+ *  - onTrack: 상대 영상 들어올 때
+ *  - onIce:   ICE 후보를 찾을 때 (시그널링 서버로 전달)
+ *  - onState: 연결 상태 바뀔 때
  */
 export function createPeer({ onTrack, onIce, onState }) {
-  // STUN 서버는 "내 공인 IP"를 알아내는 용도
-  // 구글 공개 STUN 서버 사용 (무료)
   const pc = new RTCPeerConnection({
+    // STUN: 내 공인 IP 파악 (구글 공개 STUN 사용)
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
   });
 
-  // 상대방이 보낸 원격 스트림 수신 시
+  // 상대가 보낸 영상 스트림 수신
   pc.ontrack = (event) => {
-    // 여러 트랙(video, audio)이 있을 수 있지만
-    // 일반적으론 event.streams[0]이 전체 스트림
-    onTrack?.(event.streams[0]);
+    const [stream] = event.streams;
+    onTrack?.(stream);
   };
 
-  // ICE 후보(가능한 네트워크 경로)를 찾았을 때
+  // 사용 가능한 네트워크 경로(ICE candidate)를 찾으면 호출됨
   pc.onicecandidate = (event) => {
-    if (event.candidate) {
-      onIce?.(event.candidate);
-    }
+    if (event.candidate) onIce?.(event.candidate);
   };
 
-  // 연결 상태 변경 시 (new → connecting → connected …)
+  // 연결 상태 변경(new → connecting → connected ...)
   pc.onconnectionstatechange = () => {
     onState?.(pc.connectionState);
   };
