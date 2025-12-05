@@ -13,6 +13,7 @@ import { io } from "socket.io-client";
 export function createSocket() {
   // URL은 .env (VITE_SIGNAL_URL)에서 주입
   const url = import.meta.env.VITE_SIGNAL_URL;
+  console.log("[signal url]", url);
   return io(url, {
     transports: ["websocket"], // 디버깅 단순화를 위해 websocket 고정
   });
