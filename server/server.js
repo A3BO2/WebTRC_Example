@@ -11,10 +11,16 @@ import { Server } from "socket.io";
 import cors from "cors";
 
 const app = express();
-
+const FRONT = "https://webtrc-client.onrender.com";
 // [보안 팁] 배포 후에는 origin을 프론트 도메인으로 제한하세요.
 // 예: cors({ origin: ["https://webrtc-client-xxxx.onrender.com"] })
-app.use(cors());
+app.use(
+  cors({
+    origin: FRONT,
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
 // 헬스체크/확인용
 app.get("/", (_, res) => res.send("WebRTC signaling OK"));
@@ -23,7 +29,7 @@ const httpServer = http.createServer(app);
 
 // Socket.IO 서버: 브라우저 ↔ 서버 간 신호(이벤트) 전달 전용
 const io = new Server(httpServer, {
-  cors: { origin: "*" }, // 초기엔 * 허용 → 배포 후 프론트 도메인으로 바꾸면 더 안전
+  cors: { origin: FRONT, methods: ["GET", "POST"], credentials: true }, // 초기엔 * 허용 → 배포 후 프론트 도메인으로 바꾸면 더 안전
 });
 
 // ── 핵심: 같은 room 사용자끼리만 신호를 주고받게 한다 ──

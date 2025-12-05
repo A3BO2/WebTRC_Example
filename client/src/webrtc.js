@@ -15,7 +15,10 @@ export function createSocket() {
   const url = import.meta.env.VITE_SIGNAL_URL;
   console.log("[signal url]", url);
   return io(url, {
-    transports: ["websocket"], // 디버깅 단순화를 위해 websocket 고정
+    withCredentials: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
+    timeout: 20000, // 초기 연결 지연 대비
   });
 }
 
