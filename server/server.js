@@ -29,7 +29,13 @@ const httpServer = http.createServer(app);
 
 // Socket.IO 서버: 브라우저 ↔ 서버 간 신호(이벤트) 전달 전용
 const io = new Server(httpServer, {
-  cors: { origin: FRONT, methods: ["GET", "POST"], credentials: true }, // 초기엔 * 허용 → 배포 후 프론트 도메인으로 바꾸면 더 안전
+  // ★ 클라 설정과 동일하게 맞추기
+  path: "/socket.io",
+  cors: {
+    origin: FRONT,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 // ── 핵심: 같은 room 사용자끼리만 신호를 주고받게 한다 ──

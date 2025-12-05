@@ -15,6 +15,9 @@ export function createSocket() {
   const url = import.meta.env.VITE_SIGNAL_URL;
   console.log("[signal url]", url);
   return io(url, {
+    transports: ["polling"], // ← websocket 고정 금지
+    upgrade: true, // 기본 true지만, 명시해 줌
+    path: "/socket.io",
     withCredentials: true,
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
